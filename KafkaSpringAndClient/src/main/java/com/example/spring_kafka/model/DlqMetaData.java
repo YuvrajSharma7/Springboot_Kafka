@@ -16,4 +16,5 @@ public class DlqMetaData {
     private byte retryCount;
     private String appName;
     private String instanceId;
+    private Order orderData;
 }

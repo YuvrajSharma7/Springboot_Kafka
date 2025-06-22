@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-// @todo: create AsyncKafkaClientConsumerService for kafka-client library(maven) consumers
+
 @Service
 @EnableScheduling
 @Slf4j
@@ -54,8 +54,26 @@ public class AsyncKafkaConsumerService implements DisposableBean {
 
     }
 
-    // to do add error handling and retry logic using @Retryable annotation
+    // todo add error handling and retry logic using @Retryable annotation
     // also another listener for DLQ topic should be implemented to process dlq records
+
+    @KafkaListener(
+            topics = "${source.dlq}",
+            id = "${consumer.group.id}",
+            groupId = "${consumer.group.dlq}",
+            containerFactory = "kafkaListenerContainerFactory"
+    )
+    @KafkaHandler
+    public void handleDlqMessage(List<ConsumerRecord<String, String>> records, Acknowledgment acknowledgment) {
+
+        executorService.submit(() -> {
+            acknowledgment.acknowledge();
+            // Simulate processing
+            log.info("Received {} dlq records", records.size());
+            recordProcessor.processDlqRecord(records);
+        });
+
+    }
 
     @Scheduled(cron = "* /1 * * * *")
     public void logMetrices() {
@@ -79,6 +97,7 @@ public class AsyncKafkaConsumerService implements DisposableBean {
          */
     }
 
+    // to called jsu before the application/container shutdown to avoid memory leaks
     @Override
     public void destroy() {
         if (executorService != null) {

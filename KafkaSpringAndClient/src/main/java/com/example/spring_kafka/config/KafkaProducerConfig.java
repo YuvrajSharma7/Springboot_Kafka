@@ -14,6 +14,10 @@ import java.util.Map;
 
 /**
  * This config is based on <artifactId>spring-kafka</artifactId> dependency is
+ *  additionally we can use <artifactId>snappy-java</artifactId> dependency for compression of messages
+ *  then we can use snappy compression in producer config as compression.type=snappy
+ *  then kafka producer will compress messages using snappy algorithm automatically and send them to kafka broker
+ *  then kafka consumer will decompress messages automatically
  */
 @Configuration
 public class   KafkaProducerConfig {
