@@ -1,5 +1,6 @@
 package com.example.spring_kafka.consumer;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Service
 @EnableScheduling
+@Slf4j
 public class KafkaConsumerService {
 
     @KafkaListener(
@@ -25,7 +27,7 @@ public class KafkaConsumerService {
     @KafkaHandler
     public void handleMessage(List<ConsumerRecord<String, String>> records, Acknowledgment acknowledgment) {
         for (ConsumerRecord<String, String> record : records) {
-            System.out.println("Received message: key=" + record.key() + ", value=" + record.value());
+            log.info("Received message: key={}, value={}", record.key(), record.value());
         }
         acknowledgment.acknowledge();
     }
@@ -59,9 +61,9 @@ public class KafkaConsumerService {
         long usedMemory = heapMemoryUsage.getUsed();
         long remainingMemory = maxMemory - usedMemory;
 
-        System.out.println("Max memory: " + maxMemory + " bytes");
-        System.out.println("Heap memory used: " + usedMemory + " bytes");
-        System.out.println("Remaining memory: " + remainingMemory + " bytes");
+        log.info("Max memory: {} bytes", maxMemory);
+        log.info("Heap memory used: {} bytes", usedMemory);
+        log.info("Remaining memory: {} bytes", remainingMemory);
     }
 
 
